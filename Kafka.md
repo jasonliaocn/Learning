@@ -1,4 +1,4 @@
-﻿Centos7下Zookeeper安装及使用
+Centos7下Zookeeper安装及使用
 <1> 安装Kafka
 从清华镜像下载安装包
 [root@localhost ~]# wget https://mirrors.tuna.tsinghua.edu.cn/apache/kafka/1.0.0/kafka_2.11-1.0.0.tgz
@@ -8,7 +8,7 @@
 <2> 配置Kafka
 [root@localhost ~]# vi /opt/kafka_2.11-1.0.0/config/server.properties
 主要修改如下内容：
-
+-----------------------------------------------------------
 # brokerid就是指各台服务器对应的id，所以各台服务器值不同
 broker.id=0
 # 端口号，无需改变
@@ -19,6 +19,7 @@ host.name=localhost
 zookeeper.connect=localhost:2181
 # 日志目录
 log.dirs=/tmp/kafka-logs
+-----------------------------------------------------------
 
 <3> 启动Kafka
 [root@localhost ~]# /opt/kafka_2.11-1.0.0/bin/kafka-server-start.sh /opt/kafka_2.11-1.0.0/config/server.properties
