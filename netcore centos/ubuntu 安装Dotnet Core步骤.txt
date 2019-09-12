@@ -1,0 +1,27 @@
+ubuntu18-04/runtime-2.2.6
+1.
+wget -q https://packages.microsoft.com/config/ubuntu/16.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb
+2.
+sudo dpkg -i packages-microsoft-prod.deb
+3.
+sudo apt-get install apt-transport-https
+4.
+sudo apt-get update
+5.
+sudo apt-get install aspnetcore-runtime-2.2
+6.
+pscp "D:\Android\Projects\ZY.Library.Inventory\ZY.Library.Inventory.Service\bin\Release\netcoreapp2.2\publish\zy.library.inventory.service.zip" sysadm@192.168.2.20:/home/sysadm
+7.
+sudo unzip -d /opt/zhiyan/rfidinventory/api /home/sysadm/zy.library.inventory.service.zip
+8.
+sudo vim /etc/netplan/01-network-manager-all.yaml
+# Let NetworkManager manage all devices on this system
+network:
+  version: 2
+  # renderer: NetworkManager
+  ethernets:
+          ens33:
+                  addresses: [192.168.0.111/24]		#ipaddress
+                  gateway4: 192.168.0.1		#gateway
+                  nameservers:			#dns
+                        addresses: [192.168.0.1]

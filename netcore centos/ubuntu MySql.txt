@@ -1,0 +1,21 @@
+ubuntu18-04
+sudo apt-get update
+sudo apt-get install mysql-server
+1.
+$ sudo cat /etc/mysql/debian.cnf
+2.
+$ mysql -u debian-sys-maint -p
+3.修改密码，本篇文章将密码修改成 root , 用户可自行定义。
+$ use mysql;
+$ update mysql.user set authentication_string=password('root') where user='root' and Host ='localhost';
+update user set plugin="mysql_native_password"; 
+flush privileges;
+quit;
+4.重新启动mysql:
+$ sudo service mysql restart
+5. 重新登录MySql
+$ mysql -u root -p 
+6. 运行远程访问
+GRANT ALL PRIVILEGES ON *.* TO root@localhost IDENTIFIED BY "123456";
+
+参考：https://www.cnblogs.com/williamjie/p/11126528.html

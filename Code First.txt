@@ -1,0 +1,73 @@
+一. 模型设计  
+     1.  遵循EF标准，注意表关系配对  
+     2.  数据模型里尽量把必须的属性和说明都写全  
+     3.  EF默认id字段为主键，如果没有，需指定主键  
+  
+二. 数据迁移  
+     1.  命令运行环境：visual studio工具栏->工具->NuGet 程序包管理器->程序包管理器控制台  
+     2.  基本命令和常用参数  
+        >  get-help                  获取帮助的命令(例：get-help Enable-Migrations –detailed)  
+           –detailed                 详细用法  
+        >  Enable-Migrations         启用迁移  
+           -Force                    强制覆盖  
+           -ProjectName              目标项目(迁移类所在的项目)  
+           -StartUpProjectName       启动项目(包含数据库连接字符串配置文件所在的项目)  
+           -ContextTypeName          需要迁移的数据库(类)  
+           -ConnectionStringName     指定使用配置文件中连接字符串的名称  
+           -ConnectionString         指定使用的连接字符串  
+           -ConnectionProviderName   指定连接字符串的provider名称  
+           -MigrationsDirectory      指定迁移文件的目录（多个数据库，独立自动迁移用）  
+        >  Add-Migration             为挂起的Model变化添加迁移脚本  
+           -Force  
+           -ProjectName  
+           -StartUpProjectName  
+           -ConfigurationTypeName    指定使用的迁移配置  
+           -IgnoreChanges            忽略检测到挂起的model改变，为已有的数据库启用迁移创建一个初始的，空的迁移。  
+           -ConnectionStringName    
+           -ConnectionString        
+           -ConnectionProviderName   
+        >  Update-Database           将挂起的迁移更新到数据库  
+           -Force  
+           -ProjectName  
+           -StartProjectName  
+           -ConfigurationTypeName  
+           -ConnectionStringName   
+           -ConnectionString   
+           -ConnectionProviderName   
+           -SourceMigration          只有-Script打开时才有效。指定迁移的名称用作更新的起点。忽略则使用最后一次应用的迁移。  
+           -TargetMigration          指定将数据库更新到哪个迁移的名称。  
+           -Script                   生成SQL脚本  
+        >  Get-Migrations            获取已经应用的迁移                                     
+     3.  迁移操作步骤举例：  
+             DataBase                       ：解决方案中，数据模型层项目名称  
+             Member                         ：解决方案中，启动项的名称  
+             DataBase.Member.MemberEntities ：需要应用数据迁移的数据上下文  
+         a.  第一次启用迁移，输入命令：   
+             Enable-Migrations -ProjectName DataBase -StartUpProjectName Member -ContextTypeName DataBase.Member.MemberEntities   
+             并敲回车键，然后打开生成的Migrations文件夹中的Configuration.cs文件，   
+             把构造方法中的AutomaticMigrationsEnabled = false;改为AutomaticMigrationsEnabled = true;  
+             如果有多个数据库，每个库需要独立指定迁移文件，命令格式如下：  
+             Enable-Migrations -ProjectName DataBase -StartUpProjectName Member -ContextTypeName DataBase.Member.MemberEntities -MigrationsDirectory:MemberMigrations  
+         b.  模型有改动时，输入命令：add-migration update20150508 -ProjectName DataBase -StartUpProjectName Member -Force并敲回车键，创建迁移脚本  
+             然后 输入命令：Update-Database -Verbose -ProjectName DataBase -StartUpProjectName Member并敲回车键，执行迁移操作  
+     4.  配置自动迁移  
+         在应用程序的入口方法(函数)里注册自动迁移：  
+         Database.SetInitializer(new MigrateDatabaseToLatestVersion<DataBase.Member.MemberEntities, DataBase.MemberMigrations.Configuration>());   
+         注意：Configuration.cs生成的是internal sealed class，如果不在启动程序集中，则需要修改成public  
+     5.  脱离visual studio环境做数据库版本迁移，可用migrate.exe，可参考：http://msdn.microsoft.com/zh-cn/data/jj618307  
+  
+三. 注意事项：  
+     1.  连接字符串不用DBFirst自动生成的那么复杂，采用如下格式即可：  
+         <add name="MemberEntities" connectionString="server=.;database=Member;integrated security=true;"  providerName="System.Data.SqlClient"/>  
+     2.  有挂起的Model改变时，会导致操作不正常，注意操作步骤，必要时清理挂起的迁移。  
+     3.  修正后数据库，里面的数据如果需要调整，用Configuration.cs文件里的Seed方法，示例如下：  
+        protected override void Seed(DataBase.Member.MemberEntities context)  
+        {  
+            var users = new List<User>  
+            {  
+                new User { Account = "test",   Password = "123" },  
+                new User { Account = "admin",   Password = "456" }  
+            };  
+            users.ForEach(s => context.Users.AddOrUpdate(p => p.Account, s));  
+            context.SaveChanges();  
+        }  

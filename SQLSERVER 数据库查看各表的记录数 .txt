@@ -1,0 +1,29 @@
+select   a.name as 表名,max(b.rows) as 记录条数   from   sysobjects   a   ,sysindexes   b     
+  where   a.id=b.id   and   a.xtype='u'   
+group   by   a.name   
+order by max(b.rows) desc
+ 
+select SUM(记录条数) as 总记录数 from(
+　　select top 10000 a.name as 表名,max(b.rows) as 记录条数 from sysobjects a ,sysindexes b 
+　　where a.id=b.id and a.xtype='u' 
+　　group by a.name 
+　　order by max(b.rows) desc
+) t1
+
+1、打开 sql server configuration manager，启动sql server browser服务（建议设置成自动）
+2、设置protocols for sqlexpress，enable其中的“named pipes”、“tcp/ip”
+3、（如果安装了vs2010）在开始菜单中，启动“Visual Studio Command Prompt (2010)”，然后输入“SQLCMD -S (local)\sqlexpress -E ”连接数据库
+4、输入如下命令，启用sa帐户和并设置帐户密码为sa
+alter login sa with password='zhiyan666'
+go
+alter login sa enable
+go
+
+5、附加库文件，使用如下命令
+exec sp_attach_db  @dbname=N'库名称', @filename1=N'mdf文件', @filename2=N'ldf文件'
+go
+
+6、启动注册表编辑器，在HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Microsoft SQL Server\MSSQL10.SQLEXPRESS\MSSQLServer 下找到LoginMode键，设置值为2
+
+7、重新启动sqlserver 服务，可以使用命令行：net stop /y mssql$sqlexpress ，或者在sql server configuration manager中重启。
+8、用sa帐户连接sqlserver express吧

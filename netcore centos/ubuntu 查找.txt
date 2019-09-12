@@ -1,0 +1,22 @@
+ubuntu18-04
+1. 查找所有文件名好汉aaa的文件
+$ sudo find / -name ‘*.aaa.*'
+2. 查找所有文件内容包含artful的位置
+$ sudo grep -R artful /etc/*
+3.查找完全匹配 artful的内容
+$ sudo grep -Rw artful /etc/*
+4. 仅列出包含文字的文件名
+$ sudo grep -Rl artful /etc/*
+5. 查询不区分大小写
+$ sudo grep -Ril artful /etc/*
+6.在conf文件中查找包含bash的文件名称
+$ sudo grep -Ril bash /etc/*.conf
+$ sudo grep -Ril --include=\*.conf bash /etc/*
+7. 排除特点文件名
+$ sudo grep -Ril --exclude=\*.conf bash /etc/*
+8. 排除特定目录
+$ sudo grep --exclude-dir=/etc/grub.d -Rwl artful /etc/*
+9. 显示行号
+$ sudo grep -Rni bash /etc/*.conf
+10. 找到所有不包含特定字符串的文件
+$ sudo grep -Rlv artful /etc/*

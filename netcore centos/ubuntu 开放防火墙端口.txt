@@ -1,0 +1,14 @@
+ubuntu18-04
+1.
+$ sudo apt-get install iptables
+2.
+$ iptables -I INPUT -p tcp --dport 80 -j ACCEPT
+3.
+$ iptables-save
+4.
+$ sudo apt-get install iptables-persistent
+5.
+$ sudo netfilter-persistent save
+$ sudo netfilter-persistent reload
+6.
+$ sudo netstat -tunlp|grep 80

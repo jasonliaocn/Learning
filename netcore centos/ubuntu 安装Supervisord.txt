@@ -1,0 +1,77 @@
+ubuntu18-04
+1. 安装
+$sudo apt-get install supervisor
+2. 查看配置
+$echo_supervisord_conf
+3. 生成默认配置文件
+sudo sh -c 'echo_supervisord_conf > /etc/supervisor/supervisord.conf'
+4.  修改配置文件
+$ sudo vim /etc/supervisor/supervisord.conf
+5. 添加如下内容
+#修改生产的配置文件的第49-51行，去掉前面的分号，设置用户名密码
+serverurl=http://127.0.0.1:9001 ; use an http:// url to specify an inet socket
+username=name              ; should be same as http_username if set
+password=pwd
+#最后include配置改为
+[include]
+;files = relative/directory/*.ini
+files = /etc/supervisor/conf.d/*.ini
+———————————————
+6. /etc/supervisor/conf.d目录下添加sample.ini配置文件，保存前要删掉所有中文注释
+[program:Sample1]
+command=dotnet Sample1.dll  #要执行的命令
+directory=/root/netcoresamples/sample1 #命令执行的目录
+environment=ASPNETCORE__ENVIRONMENT=Production #环境变量
+user=root  #进程执行的用户身份
+stopsignal=INT
+autostart=true #是否自动启动
+autorestart=true #是否自动重启
+startsecs=3 #自动重启间隔
+stderr_logfile=/root/netcoresamples/sample1/log/Sample1.err.log #标准错误日志
+stdout_logfile=/root/netcoresamples/sample1/log/Sample1.log #标准输出日志
+
+[program:Sample2]
+command=dotnet Sample2.dll  #要执行的命令
+directory=/root/netcoresamples/sample2 #命令执行的目录
+environment=ASPNETCORE__ENVIRONMENT=Production #环境变量
+user=root  #进程执行的用户身份
+stopsignal=INT
+autostart=true #是否自动启动
+autorestart=true #是否自动重启
+startsecs=5 #自动重启间隔
+stderr_logfile=/root/netcoresamples/sample2/log/Sample2.err.log #标准错误日志
+stdout_logfile=/root/netcoresamples/sample2/log/Sample2.log #标准输出日志
+7.
+$sudo supervisorctl shutdown
+8.
+sudo supervisord -c /etc/supervisor/supervisord.conf
+9.
+$sudo supervisorctl reload
+10.
+$sudo supervisorctl start program_name
+11.常用命令
+supervisorctl stop|start program_name #停止|启动任务
+
+supervisorctl restart program_name #重启某个进程
+
+supervisorctl stop foo: #停止所有属于名为foo这个分组的进程(start,restart同理)，注意冒号
+
+supervisorctl stop all#停止全部进程，注：start、restart、stop都不会载入最新的配置文件。
+
+supervisorctl reload#载入最新的配置文件，停止原有进程并按新的配置启动、管理所有进程。
+
+supervisorctl update#根据最新的配置文件，启动新配置或有改动的进程，配置没有改动的进程不会受影响而重启。
+supervisorctl tail -f program_name # 查看 该程序的日志
+supervisorctl shutdown #关闭supervisord进程
+supervisorctl status #查看所有任务状态
+ps -ef | grep common #查看进程信息
+
+参考链接
+https://blog.csdn.net/A156348933/article/details/85158005
+
+执行supervisord -c /etc/supervisord.conf 
+报错：Error: Another program is already listening on a port that one of our HTTP servers is configured to use.  Shut this program down first before starting supervisord.
+解决方法：
+find / -name supervisor.sock
+
+unlink supervisor.sock
