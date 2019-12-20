@@ -75,3 +75,26 @@ https://blog.csdn.net/A156348933/article/details/85158005
 find / -name supervisor.sock
 
 unlink supervisor.sock
+
+解决unix:///tmp/supervisor.sock no such file的问题
+1、打开配置文件
+
+sudo vim /etc/supervisord.conf
+这里把所有的/tmp路径改掉，/tmp/supervisor.sock 改成 /var/run/supervisor.sock，/tmp/supervisord.log 改成 /var/log/supervisor.log，/tmp/supervisord.pid 改成 /var/run/supervisor.pid 要不容易被linux自动清掉
+
+2、修改权限
+
+sudo chmod 777 /run
+sudo chmod 777 /var/log
+如果没改，启动报错 IOError: [Errno 13] Permission denied: '/var/log/supervisord.log'
+
+3、创建supervisor.sock
+
+sudo touch /var/run/supervisor.sock
+sudo chmod 777 /var/run/supervisor.sock
+4、启动supervisord，注意stop之前的实例或杀死进程
+
+sudo supervisorctl shutdown
+sudo supervisord
+原文链接：
+https://blog.csdn.net/qq_28885149/article/details/79364685
